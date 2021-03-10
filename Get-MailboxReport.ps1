@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Get-MailboxReport.ps1 - Mailbox report generation script.
 
@@ -290,6 +290,8 @@ foreach ($mb in $mailboxes)
 	#Create a custom PS object to aggregate the data we're interested in
 	
 	$userObj = New-Object PSObject
+
+	$userObj | Add-Member NoteProperty -Name "SamAccountName" -Value $mb.SamAccountName
 	$userObj | Add-Member NoteProperty -Name "DisplayName" -Value $mb.DisplayName
 	$userObj | Add-Member NoteProperty -Name "Mailbox Type" -Value $mb.RecipientTypeDetails
 	$userObj | Add-Member NoteProperty -Name "Title" -Value $user.Title
@@ -352,6 +354,14 @@ foreach ($mb in $mailboxes)
 
     $userObj | Add-Member NoteProperty -Name "Primary Email Address" -Value $mb.PrimarySMTPAddress
     $userObj | Add-Member NoteProperty -Name "Organizational Unit" -Value $user.OrganizationalUnit
+
+
+#ANDY
+#https://www.millersystems.com/powershell-exporting-multi-valued-attributes-via-export-csv-cmdlet/
+#https://www.365admin.com.au/2018/04/how-to-force-powershell-to-export-multi.html
+# {"isEnabled":true,"protocolType":"POP3"} 
+
+    $userObj | Add-Member NoteProperty -Name "ProtocolSettings" -Value ($mb.ProtocolSettings -join ";")
 
 	
 	#Add the object to the report
