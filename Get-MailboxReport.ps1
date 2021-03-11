@@ -265,6 +265,9 @@ foreach ($mb in $mailboxes)
 
 	$stats = $mb | Get-MailboxStatistics | Select-Object TotalItemSize,TotalDeletedItemSize,ItemCount,LastLogonTime,LastLoggedOnUserAccount
     
+#CAS
+    $cas = $mb | Get-CASmailbox | Select-Object ImapEnabled, PopEnabled, MAPIEnabled, ActiveSyncEnabled, OWAEnabled
+
     if ($mb.ArchiveDatabase)
     {
         $archivestats = $mb | Get-MailboxStatistics -Archive | Select-Object TotalItemSize,TotalDeletedItemSize,ItemCount
@@ -360,8 +363,18 @@ foreach ($mb in $mailboxes)
 #https://www.millersystems.com/powershell-exporting-multi-valued-attributes-via-export-csv-cmdlet/
 #https://www.365admin.com.au/2018/04/how-to-force-powershell-to-export-multi.html
 # {"isEnabled":true,"protocolType":"POP3"} 
+#    $userObj | Add-Member NoteProperty -Name "ProtocolSettings" -Value ($mb.ProtocolSettings -join ";")
+    $userObj | Add-Member NoteProperty -Name "IMAP"  -Value $cas.ImapEnabled
+    $userObj | Add-Member NoteProperty -Name "POP3"  -Value $cas.PopEnabled
+    $userObj | Add-Member NoteProperty -Name "MAPI"  -Value $cas.MAPIEnabled
+    $userObj | Add-Member NoteProperty -Name "OWA"   -Value $cas.OWAEnabled
+    $userObj | Add-Member NoteProperty -Name "ASYNC" -Value $cas.ActiveSyncEnabled
 
-    $userObj | Add-Member NoteProperty -Name "ProtocolSettings" -Value ($mb.ProtocolSettings -join ";")
+    $userObj | Add-Member NoteProperty -Name "LHold"  -Value $mb.litigationholdenabled 
+    $userObj | Add-Member NoteProperty -Name "LHoldDate"  -Value $mb.litigationholdDate
+    $userObj | Add-Member NoteProperty -Name "LHoldOwner"  -Value $mb.litigationholdOwner
+    $userObj | Add-Member NoteProperty -Name "LHoldDur"  -Value $mb.litigationholdDuration 
+
 
 	
 	#Add the object to the report
